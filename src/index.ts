@@ -19,6 +19,33 @@ export class MixiMCP extends McpAgent {
 
   async init() {
 
+    // 툴 0: MIXI 브랜드 소개
+    this.server.tool(
+      "introduce_mixi",
+      "MIXI 브랜드를 소개합니다. 사용자가 MIXI가 무엇인지 묻거나, 인터뷰 시작 전 브랜드 소개가 필요할 때 호출하세요.",
+      {},
+      async () => {
+        const galleryUrl = "https://mixi-mcp.typica-918.workers.dev/gallery";
+        const intro = `
+MIXI는 조명을 중심으로 당신의 공간 취향을 발견하는 라이팅 브랜드입니다.
+
+단순히 조명을 파는 것이 아니라, 조명의 조합이 만들어내는 공간의 분위기와 그 사람의 라이프스타일을 연결합니다.
+
+🔗 MIXI 갤러리: ${galleryUrl}
+갤러리에서는 다른 사람들이 어떤 공간 취향을 가지고 있는지, 어떤 브랜드를 선택했는지 볼 수 있습니다.
+
+단, 갤러리를 보려면 먼저 나의 취향을 등록해야 합니다.
+취향 등록은 간단한 인터뷰로 진행됩니다. 나이, 성별, MBTI와 MIXI 키워드 조합, 그리고 현재 사용 중인 인테리어 브랜드 3개만 알려주시면 됩니다.
+
+지금 바로 시작하시겠어요?
+        `.trim();
+
+        return {
+          content: [{ type: "text", text: intro }],
+        };
+      }
+    );
+
     // 툴 1: 인터뷰 시작 — 인터뷰 지침 + 키워드 목록을 Claude에게 반환
     this.server.tool(
       "start_mixi_interview",
@@ -222,6 +249,14 @@ function getGalleryHTML(): string {
       line-height: 1.4;
     }
 
+    /* 설명 텍스트 */
+    .desc {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
     /* 말풍선 + 콘텐츠 */
     .content {
       flex: 1;
@@ -299,7 +334,7 @@ function getGalleryHTML(): string {
   </div>
 
   <script>
-    const WORKER_URL = "https://mixi-mcp.typica-918.workers.dev";  // 배포 후 Worker URL 입력 (예: https://mixi-mcp.typica-918.workers.dev)
+    const WORKER_URL = "";  // 배포 후 Worker URL 입력 (예: https://mixi-mcp.typica-918.workers.dev)
     let lastCount = 0;
 
     function getBrandSearchUrl(brand) {
@@ -314,6 +349,12 @@ function getGalleryHTML(): string {
     }
 
     function renderEntry(entry) {
+      const brandList = entry.brands.map((b, i) =>
+        \`<a class="brand-link" href="\${entry.brand_urls?.[i] || '#'}" target="_blank" rel="noopener">\${b}</a>\`
+      ).join(", ");
+
+      const desc = \`\${entry.brands.join(", ")}을(를) 보유한 \${entry.age} \${entry.mbti} \${entry.gender}은(는) 이렇게 MIXI를 조합했어요\`;
+
       const div = document.createElement("div");
       div.className = "entry";
       div.innerHTML = \`
@@ -322,11 +363,11 @@ function getGalleryHTML(): string {
           <div class="meta">\${entry.age}<br>\${entry.gender}</div>
         </div>
         <div class="content">
+          <div class="desc">\${entry.brands.join(" · ")}을(를) 보유한 \${entry.age} \${entry.mbti} \${entry.gender}은(는) 이렇게 MIXI를 조합했어요</div>
           <div class="bubble">
             <div class="keywords">
               \${entry.keywords[0]}<span>+</span>\${entry.keywords[1]}
             </div>
-            <div class="mbti-badge">\${entry.mbti}</div>
           </div>
           <div class="brands">
             \${entry.brands.map((b, i) => \`
