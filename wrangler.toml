@@ -1,0 +1,16 @@
+name = "mixi-mcp"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[kv_namespaces]]
+binding = "MIXI_KV"
+id = "41a07963f9ff4b0ba5ff1bdd7d1a8d65"
+
+[[durable_objects.bindings]]
+name = "MCP_OBJECT"
+class_name = "MixiMCP"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["MixiMCP"]
