@@ -299,7 +299,7 @@ function getGalleryHTML(): string {
   </div>
 
   <script>
-    const WORKER_URL = "";  // 배포 후 Worker URL 입력 (예: https://mixi-mcp.typica-918.workers.dev)
+    const WORKER_URL = "https://mixi-mcp.typica-918.workers.dev";  // 배포 후 Worker URL 입력 (예: https://mixi-mcp.typica-918.workers.dev)
     let lastCount = 0;
 
     function getBrandSearchUrl(brand) {
